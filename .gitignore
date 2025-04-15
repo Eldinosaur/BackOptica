@@ -9,3 +9,6 @@ __pycache__/
 .DS_Store
 *.log
 *.sqlite3
+
+# Archivos Varios
+comandos.txt

@@ -12,3 +12,6 @@ __pycache__/
 
 # Archivos Varios
 comandos.txt
+
+# Carpetas de prueba
+pruebas/

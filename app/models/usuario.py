@@ -8,4 +8,4 @@ class Usuario(Base):
     Usuario = Column(String(50), unique=True, nullable=False)
     Nombre = Column(String(50))
     Apellido = Column(String(50))
-    Clave = Column(String(50))  
+    Clave = Column(String(255))  

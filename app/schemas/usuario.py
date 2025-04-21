@@ -21,3 +21,9 @@ class LoginResponse(BaseModel):
     IDusuario: int
     Nombre: str
     Apellido: str
+
+#Cambio de Clave
+class CambioClave(BaseModel):
+    IDusuario: int
+    ClaveActual: str
+    NuevaClave: str

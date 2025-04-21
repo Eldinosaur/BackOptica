@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import SessionLocal
-from app.schemas.usuario import UsuarioLogin, LoginResponse
-from app.crud.auth import autenticar_usuario
+from app.schemas.usuario import UsuarioLogin, LoginResponse, CambioClave
+from app.crud.auth import autenticar_usuario, cambiar_clave
 from app.utils.jwt import crear_token
 
 router = APIRouter()
@@ -14,6 +14,7 @@ def get_db():
     finally:
         db.close()
 
+# Ruta para inicio de sesion
 @router.post("/login")
 def login(data: UsuarioLogin, db: Session = Depends(get_db)):
     usuario = autenticar_usuario(db, data.Usuario, data.Clave)
@@ -27,3 +28,11 @@ def login(data: UsuarioLogin, db: Session = Depends(get_db)):
         "Nombre": usuario.Nombre,
         "Apellido": usuario.Apellido
         }
+
+# Ruta para cambio de clave
+@router.post("/cambioclave")
+def cambiar_contrasena(data: CambioClave, db: Session = Depends(get_db)):
+    exito, mensaje = cambiar_clave(db, data.IDusuario, data.ClaveActual, data.NuevaClave)
+    if not exito:
+        raise HTTPException(status_code=401, detail=mensaje)
+    return {"mensaje": mensaje}

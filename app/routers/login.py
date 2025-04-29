@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import SessionLocal
-from app.schemas.usuario import UsuarioLogin, LoginResponse, CambioClave
+from app.schemas.usuario import UsuarioLogin, CambioClave
 from app.crud.login import autenticar_usuario, cambiar_clave
 from app.utils.jwt import crear_token
 

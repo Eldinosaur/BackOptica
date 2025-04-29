@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
 from app.database import Base
 
 class Usuario(Base):
@@ -8,4 +9,5 @@ class Usuario(Base):
     Usuario = Column(String(50), unique=True, nullable=False)
     Nombre = Column(String(50))
     Apellido = Column(String(50))
-    Clave = Column(String(255))  
+    Clave = Column(String(255))
+    consultas = relationship("DatosConsulta", back_populates="usuario")  

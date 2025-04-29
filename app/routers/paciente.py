@@ -16,10 +16,11 @@ def get_db():
 @router.post("/paciente", status_code=status.HTTP_201_CREATED)
 def agregar_paciente(paciente: PacienteCreate, db: Session = Depends(get_db)):
     nuevo_paciente = crear_paciente(db, paciente)
-    return {
+    if nuevo_paciente:
+        return {
         "message": "Paciente creado exitosamente",
         "IDpaciente": nuevo_paciente.IDpaciente
-    }
+        }
 
 @router.get("/paciente/{paciente_id}")
 def get_paciente_id(paciente_id: int, db: Session = Depends(get_db)):

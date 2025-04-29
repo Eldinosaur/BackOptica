@@ -14,14 +14,6 @@ class UsuarioOut(UsuarioBase):
     class Config:
         orm_mode = True
 
-#Respuesta de Login
-class LoginResponse(BaseModel):
-    access_token: str
-    token_type: str
-    IDusuario: int
-    Nombre: str
-    Apellido: str
-
 #Cambio de Clave
 class CambioClave(BaseModel):
     IDusuario: int

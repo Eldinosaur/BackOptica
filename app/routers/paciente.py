@@ -2,8 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.database import SessionLocal
 from app.schemas.paciente import PacienteCreate
-from app.crud.paciente import crear_paciente, obtener_paciente_id, obtener_todos_pacientes, obtener_paciente_cedula, obtener_pacientes_por_nombre_apellido, actualizar_paciente
-
+from app.crud.paciente import *
 router = APIRouter()
 
 # Dependencia para obtener sesión de DB
@@ -48,7 +47,7 @@ def get_paciente_cedula(paciente_cedula: str, db: Session = Depends(get_db)):
     
     return paciente
 
-@router.get("/buscar_paciente/")
+@router.get("/buscar_paciente/{termino}")
 def get_paciente_nombre_apellido(termino: str, db: Session = Depends(get_db)):
     pacientes = obtener_pacientes_por_nombre_apellido(db, termino)
 

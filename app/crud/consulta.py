@@ -14,3 +14,8 @@ def crear_consulta_simple(db: Session, consulta_data: ConsultaSimpleCreate):
     db.commit()
     db.refresh(nueva_consulta)
     return nueva_consulta
+
+def obtener_consultas_simples_por_paciente(db: Session, id_paciente: int):
+    return db.query(DatosConsulta).filter(
+        DatosConsulta.IDpaciente == id_paciente
+    ).all()

@@ -57,3 +57,40 @@ class ConsultaCompletaCreate(BaseModel):
     receta_armazones: Optional[RecetaArmazones] = None
     receta_contacto: Optional[RecetaContacto] = None
     evolucion: EvolucionVisual
+
+# ========== MODELOS DE RESPUESTA (OUT) ==========
+
+class RecetaArmazonesOut(RecetaArmazones):
+    class Config:
+        orm_mode = True
+
+class RecetaContactoOut(RecetaContacto):
+    class Config:
+        orm_mode = True
+
+class EvolucionVisualOut(EvolucionVisual):
+    class Config:
+        orm_mode = True
+
+class RecetaBaseOut(BaseModel):
+    IDreceta: int
+    TipoLente: int
+    Fecha: date
+    receta_armazones: Optional[RecetaArmazonesOut] = None
+    receta_contacto: Optional[RecetaContactoOut] = None
+
+    class Config:
+        orm_mode = True
+
+class ConsultaCompletaOut(BaseModel):
+    IDconsulta: int
+    IDpaciente: int
+    IDusuario: int
+    FConsulta: date
+    Observaciones: str
+    Motivo: str
+    receta: Optional[RecetaBaseOut] = None
+
+    class Config:
+        orm_mode = True
+

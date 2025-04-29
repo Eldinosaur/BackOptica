@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app.models.consulta import DatosConsulta
 from app.models.receta import Recetas, RecetasArmazones, RecetasContacto
 from app.models.evolucion import EvolucionVisual
@@ -51,3 +51,40 @@ def crear_consulta_completa(db: Session, datos: ConsultaCompletaCreate):
     except Exception as e:
         db.rollback()
         raise e
+
+def obtener_consultas_completas_por_paciente(db: Session, id_paciente: int):
+    return db.query(DatosConsulta).\
+        filter(DatosConsulta.IDpaciente == id_paciente).\
+        options(
+            joinedload(DatosConsulta.receta)
+            .joinedload(Recetas.receta_armazones),
+            joinedload(DatosConsulta.receta)
+            .joinedload(Recetas.receta_contacto)
+        ).\
+        all()
+
+def obtener_consulta_completa_por_id(db: Session, id_consulta: int):
+    return db.query(DatosConsulta).\
+        filter(DatosConsulta.IDconsulta == id_consulta).\
+        options(
+            joinedload(DatosConsulta.receta)
+            .joinedload(Recetas.receta_armazones),
+            joinedload(DatosConsulta.receta)
+            .joinedload(Recetas.receta_contacto)
+        ).\
+        first()
+
+def obtener_consultas_completas_por_tipo_lente(db: Session, id_paciente: int, tipo_lente: int):
+    return db.query(DatosConsulta).\
+        join(DatosConsulta.receta).\
+        filter(
+            DatosConsulta.IDpaciente == id_paciente,
+            Recetas.TipoLente == tipo_lente
+        ).\
+        options(
+            joinedload(DatosConsulta.receta)
+            .joinedload(Recetas.receta_armazones),
+            joinedload(DatosConsulta.receta)
+            .joinedload(Recetas.receta_contacto)
+        ).\
+        all()

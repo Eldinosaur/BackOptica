@@ -15,3 +15,5 @@ class Paciente(Base):
     Direccion = Column(String(250), nullable=True)
     Antecedentes = Column(String(250), nullable=True)
     CondicionesMedicas = Column(String(250), nullable=True)
+    NombreBusqueda = Column(String(250), nullable=False)
+    ApellidoBusqueda = Column(String(250), nullable=False)

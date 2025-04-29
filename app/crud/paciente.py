@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from app.models.paciente import Paciente
 from app.schemas.paciente import PacienteCreate
 from app.utils.aes import encrypt, decrypt
@@ -14,14 +15,16 @@ def crear_paciente(db: Session, paciente: PacienteCreate):
         Correo=encrypt(paciente.Correo),
         Direccion=encrypt(paciente.Direccion),
         Antecedentes=encrypt(paciente.Antecedentes),
-        CondicionesMedicas=encrypt(paciente.CondicionesMedicas)
+        CondicionesMedicas=encrypt(paciente.CondicionesMedicas),
+        NombreBusqueda = paciente.Nombre.lower(), #Nombre para busqueda
+        ApellidoBusqueda = paciente.Apellido.lower() #Apellido para busqueda
     )
     db.add(nuevo_paciente)
     db.commit()
     db.refresh(nuevo_paciente)
     return nuevo_paciente
 
-def obtener_paciente(db: Session, paciente_id: int):
+def obtener_paciente_id(db: Session, paciente_id: int):
     paciente = db.query(Paciente).filter(Paciente.IDpaciente == paciente_id).first()
     if paciente:
         # Desencriptar campos sensibles
@@ -35,4 +38,103 @@ def obtener_paciente(db: Session, paciente_id: int):
         paciente.Direccion = decrypt(paciente.Direccion)
         paciente.Antecedentes = decrypt(paciente.Antecedentes)
         paciente.CondicionesMedicas = decrypt(paciente.CondicionesMedicas)
+    return paciente
+
+def obtener_todos_pacientes(db: Session):
+    pacientes_db = db.query(Paciente).all()
+    
+    pacientes = []
+    for paciente in pacientes_db:
+        pacientes.append({
+            "IDpaciente": paciente.IDpaciente,
+            "Cedula": decrypt(paciente.Cedula),
+            "Nombre": decrypt(paciente.Nombre),
+            "Apellido": decrypt(paciente.Apellido),
+            "FNacimiento": paciente.FNacimiento,
+            "Ocupacion": decrypt(paciente.Ocupacion),
+            "Telefono": decrypt(paciente.Telefono),
+            "Correo": decrypt(paciente.Correo),
+            "Direccion": decrypt(paciente.Direccion),
+            "Antecedentes": decrypt(paciente.Antecedentes),
+            "CondicionesMedicas": decrypt(paciente.CondicionesMedicas)
+        })
+    
+    return pacientes
+
+def obtener_paciente_cedula(db: Session, paciente_cedula: str):
+
+    cedula = encrypt(paciente_cedula)
+
+    paciente = db.query(Paciente).filter(Paciente.Cedula == cedula).first()
+    
+    if paciente:
+        return {
+            "IDpaciente": paciente.IDpaciente,
+            "Cedula": decrypt(paciente.Cedula),
+            "Nombre": decrypt(paciente.Nombre),
+            "Apellido": decrypt(paciente.Apellido),
+            "FNacimiento": paciente.FNacimiento,
+            "Ocupacion": decrypt(paciente.Ocupacion),
+            "Telefono": decrypt(paciente.Telefono),
+            "Correo": decrypt(paciente.Correo),
+            "Direccion": decrypt(paciente.Direccion),
+            "Antecedentes": decrypt(paciente.Antecedentes),
+            "CondicionesMedicas": decrypt(paciente.CondicionesMedicas)
+        }
+    
+    return None
+
+def obtener_pacientes_por_nombre_apellido(db: Session, termino):
+    if not termino:
+        return []
+
+    pacientes_db = db.query(Paciente).filter(
+        or_(
+            Paciente.NombreBusqueda.like(f"%{termino.lower()}%"),
+            Paciente.ApellidoBusqueda.like(f"%{termino.lower()}%")
+        )
+    ).all()
+
+    pacientes = []
+    for paciente in pacientes_db:
+        pacientes.append({
+            "IDpaciente": paciente.IDpaciente,
+            "Cedula": decrypt(paciente.Cedula),
+            "Nombre": decrypt(paciente.Nombre),
+            "Apellido": decrypt(paciente.Apellido),
+            "FNacimiento": paciente.FNacimiento,
+            "Ocupacion": decrypt(paciente.Ocupacion),
+            "Telefono": decrypt(paciente.Telefono),
+            "Correo": decrypt(paciente.Correo),
+            "Direccion": decrypt(paciente.Direccion),
+            "Antecedentes": decrypt(paciente.Antecedentes),
+            "CondicionesMedicas": decrypt(paciente.CondicionesMedicas)
+            # Nota: NO incluimos NombreBusqueda ni ApellidoBusqueda
+        })
+
+    return pacientes
+
+def actualizar_paciente(db: Session, paciente_id: int, datos_actualizados: PacienteCreate):
+    paciente = db.query(Paciente).filter(Paciente.IDpaciente == paciente_id).first()
+    if not paciente:
+        return None  
+
+    # Actualizar los campos, cifrando donde corresponde
+    paciente.Cedula = encrypt(datos_actualizados.Cedula)
+    paciente.Nombre = encrypt(datos_actualizados.Nombre)
+    paciente.Apellido = encrypt(datos_actualizados.Apellido)
+    paciente.FNacimiento = datos_actualizados.FNacimiento
+    paciente.Ocupacion = encrypt(datos_actualizados.Ocupacion)
+    paciente.Telefono = encrypt(datos_actualizados.Telefono)
+    paciente.Correo = encrypt(datos_actualizados.Correo)
+    paciente.Direccion = encrypt(datos_actualizados.Direccion)
+    paciente.Antecedentes = encrypt(datos_actualizados.Antecedentes)
+    paciente.CondicionesMedicas = encrypt(datos_actualizados.CondicionesMedicas)
+
+    # Actualizar campos de búsqueda en texto plano
+    paciente.NombreBusqueda = datos_actualizados.Nombre.lower()
+    paciente.ApellidoBusqueda = datos_actualizados.Apellido.lower()
+
+    db.commit()
+    db.refresh(paciente)
     return paciente

@@ -27,19 +27,24 @@ def crear_paciente(db: Session, paciente: PacienteCreate):
 
 def obtener_paciente_id(db: Session, paciente_id: int):
     paciente = db.query(Paciente).filter(Paciente.IDpaciente == paciente_id).first()
+
+    pacientes = []
+
     if paciente:
-        # Desencriptar campos sensibles
-        paciente.Nombre = decrypt(paciente.Nombre)
-        paciente.Apellido = decrypt(paciente.Apellido)
-        paciente.Cedula = decrypt(paciente.Cedula)
-        paciente.FNacimiento = paciente.FNacimiento
-        paciente.Ocupacion = decrypt(paciente.Ocupacion)
-        paciente.Telefono = decrypt(paciente.Telefono)
-        paciente.Correo = decrypt(paciente.Correo)
-        paciente.Direccion = decrypt(paciente.Direccion)
-        paciente.Antecedentes = decrypt(paciente.Antecedentes)
-        paciente.CondicionesMedicas = decrypt(paciente.CondicionesMedicas)
-    return paciente
+        return[ {
+            "IDpaciente": paciente.IDpaciente,
+            "Cedula": decrypt(paciente.Cedula),
+            "Nombre": decrypt(paciente.Nombre),
+            "Apellido": decrypt(paciente.Apellido),
+            "FNacimiento": paciente.FNacimiento,
+            "Ocupacion": decrypt(paciente.Ocupacion),
+            "Telefono": decrypt(paciente.Telefono),
+            "Correo": decrypt(paciente.Correo),
+            "Direccion": decrypt(paciente.Direccion),
+            "Antecedentes": decrypt(paciente.Antecedentes),
+            "CondicionesMedicas": decrypt(paciente.CondicionesMedicas)
+        }]
+    return pacientes
 
 def obtener_todos_pacientes(db: Session):
     pacientes_db = db.query(Paciente).all()
@@ -78,7 +83,7 @@ def obtener_paciente_cedula(db: Session, paciente_cedula: str):
 
     paciente = db.query(Paciente).filter(Paciente.Cedula == cedula).first()
 
-    
+    pacientes = []
     
     if paciente:
         ultima_consulta = (
@@ -90,7 +95,7 @@ def obtener_paciente_cedula(db: Session, paciente_cedula: str):
 
         # Extraer la fecha si hay consulta
         ultima_fecha = ultima_consulta.FConsulta if ultima_consulta else None
-        return {
+        pacientes.append( {
             "IDpaciente": paciente.IDpaciente,
             "Cedula": decrypt(paciente.Cedula),
             "Nombre": decrypt(paciente.Nombre),
@@ -103,9 +108,9 @@ def obtener_paciente_cedula(db: Session, paciente_cedula: str):
             "Antecedentes": decrypt(paciente.Antecedentes),
             "CondicionesMedicas": decrypt(paciente.CondicionesMedicas),
             "ultima_consulta": {"ultima_consulta_fecha": ultima_fecha} if ultima_fecha else None
-        }
+        })
     
-    return None
+    return pacientes
 
 def obtener_pacientes_por_nombre_apellido(db: Session, termino):
     if not termino:

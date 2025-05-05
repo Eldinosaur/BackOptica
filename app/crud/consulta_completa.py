@@ -74,16 +74,27 @@ def obtener_consulta_completa_por_id(db: Session, id_consulta: int):
         ).\
         first()
 
-def obtener_consultas_completas_por_tipo_lente(db: Session, id_paciente: int, tipo_lente: int):
+def obtener_consultas_completas_tipo_armazon(db: Session, id_paciente: int):
     return db.query(DatosConsulta).\
         join(DatosConsulta.receta).\
         filter(
             DatosConsulta.IDpaciente == id_paciente,
-            Recetas.TipoLente == tipo_lente
+            Recetas.TipoLente == 1
         ).\
         options(
             joinedload(DatosConsulta.receta)
-            .joinedload(Recetas.receta_armazones),
+            .joinedload(Recetas.receta_armazones)
+        ).\
+        all()
+
+def obtener_consultas_completas_tipo_contacto(db: Session, id_paciente: int):
+    return db.query(DatosConsulta).\
+        join(DatosConsulta.receta).\
+        filter(
+            DatosConsulta.IDpaciente == id_paciente,
+            Recetas.TipoLente == 2
+        ).\
+        options(
             joinedload(DatosConsulta.receta)
             .joinedload(Recetas.receta_contacto)
         ).\

@@ -65,10 +65,3 @@ def actualizar_paciente_endpoint(paciente_id: int, paciente: PacienteCreate, db:
     else:
         raise HTTPException(status_code=404, detail="Paciente no encontrado")
 
-
-@router.get("/pacientes/{paciente_id}/detalle", response_model=PacienteConConsultaOut)
-def get_paciente_con_consulta(paciente_id: int, db: Session = Depends(get_db)):
-    paciente = obtener_paciente_con_ultima_consulta(db, paciente_id)
-    if not paciente:
-        raise HTTPException(status_code=404, detail="Paciente no encontrado")
-    return paciente
